@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<node>
+  <interface name="org.wayfire.kbdd.layout">
+    <!--
+        The "changed" signal is for notifying other apps about a keyboard
+        layout change; currently, it is not implemented
+    -->
+    <signal name="changed">
+      <arg type="s" name="layout"/>
+    </signal>
+    <!--
+        The "enable" method takes one unsigned integer (status) as argument;
+        it is supposed to be called by a shell app to initialize or to stop
+        kbdd's keyboard layout switching protocol; if "status" is non-zero,
+        kbdd will henceforth honor "switch" commands; if "status" is zero,
+        switching will be disabled (default state is desabled); kbdd keeps
+        track of the last focus switch before this message, assuming that
+        this last-focused-to view is the shell; it then keeps track of the
+        focus switches to remember which was the last focused-to view
+        besides the shell; it is this last-focused-to view that gets its
+        keyboard changed by a subsequent "switch" command.
+    -->
+    <method name="enable">
+      <arg type="u" name="status" direction="in"/>
+    </method>
+    <!--
+        The "switch" method takes as an argument a string representing a
+        keyboard layout (in capitalized xkbd 2-letter format, e.g., "US",
+        "RU", "GR", etc.); if this layout is valid (in the sense that it
+        is a configured xkbd layout), it is accepted, otherwise it is
+        rejected; if accepted, the last-non-shell view gets its stored
+        keyboard layout switched accordingly, so when focus returns to
+        that view, the new layout applies.
+    -->
+    <method name="switch">
+      <arg type="s" name="layout" direction="in"/>
+    </method>
+  </interface>
+</node>
