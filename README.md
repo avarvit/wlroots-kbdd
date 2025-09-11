@@ -8,7 +8,7 @@ Currently supported compositors include only labwc.
 ```
 $ sudo apt update
 $ sudo apt install libwayland-server-dev libxkbcommon-dev \
-    libwlroots-0.18-dev libglib-2.0-dev libgio-2.0-dev
+    libwlroots-0.18-dev libglib-2.0-dev
 $ git clone https://github.com/avarvit/wlroots-kbdd
 $ cd wlroots-kbdd
 $ meson setup build
@@ -71,7 +71,9 @@ and passing it the argument `<argument>`. This is used among others
 to drive bundled `wf-panel-pi` widgets, such as a volume control
 widget, into actions, such as mute, volume up/down etc.
 
-The `kbdlayout` plugin, after having received a list of layouts as
+Of course, `wf-panel-pi` does not come ready with such a widget,
+thus I have developed this myself, and given it the name `kbdlayout`.
+The `kbdlayout` widget, after having received a list of layouts as
 above, and upon a click, displays a menu of layout short names, and,
 when the user clicks on one of these, sends back to the compositor
 (at DBus address `org.wayfire.kbdd.layout`) a `switch` command,
@@ -80,7 +82,9 @@ intended to instruct the compositor to swithch the keyboard layout
 of the currently configured (toplevel) window to the one sent over
 DBus. Additionally, `kbdlayout` can send to the compositor an
 `enable` command with a zero or non-zero argument to request that
-the overall functionality be turned off or on, respectively.
+the overall functionality be turned off or on, respectively. See
+the URLs at the end of this file on where to find `kbdlayout` and
+check its README for install instructions.
 
 ## Caveats
 `wlroots-kbdd` works by intercepting some wlroots calls. Interception
@@ -98,7 +102,7 @@ LD_PRELOAD setting.
 
 In this current version, if a shutdown is initiated while a DBus
 message is sent and before a few milliseconds (the timeout), the
-shotdown may hung for 90 seconds waiting for the DBus session to
+shutdown may hung for 90 seconds waiting for the DBus session to
 terminate. This is not serious, the system eventually shuts down
 and no harm is done.
 
@@ -124,7 +128,7 @@ precious files.
 `wlroots-kbdd` is not intended to provide a bullet-proof channel for
 handling keyboard layouts. Any process that can write to DBus can
 fool either `wlroots-kbdd` to switch layouts or turn it off/on, or
-misguide the `kbdlayout` plugin into displaying wrong info about
+misguide the `kbdlayout` widget into displaying wrong info about
 the the available and the current layout(s). However, `wrloots-kbdd`
 does not introduce any methods that could be used for e.g. keyboard
 hijacking and/or stealing keypresses etc. In that sense, no essential
