@@ -4,6 +4,13 @@ A RaspberryPi-specific wlroots interception library to enable
 keyboard layout reporting and switching via DBus commands.
 Currently supported compositors include only labwc.
 
+## Important compatibility note
+
+This version compiles only under bookworm. I am actively working to
+port it to trixie, and an update is due soon. Meanwhile, if you
+build the library on bookworm, it will execute on trixie with no
+issues.
+
 ## Install
 ```
 $ sudo apt update
