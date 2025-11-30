@@ -4,27 +4,87 @@ A RaspberryPi-specific wlroots interception library to enable
 keyboard layout reporting and switching via DBus commands.
 Currently supported compositors include only labwc.
 
-## Important compatibility note
+## Choose your distribution
+The current HEAD and the installation instructions are for Trixie.
+If you are running on Bookworm, checkout the "bookworm" tag before
+building as follows, and re-check README.md (this file), since the
+dependencies for Bookworm are slightly different from the ones for
+Trixie.
 
-This version compiles only under bookworm. I am actively working to
-port it to trixie, and an update is due soon. Meanwhile, if you
-build the library on bookworm, it will execute on trixie with no
-issues.
+Here is how to checkout the "bookworm" tag:
+```
+$ git checkout bookworm
+```
 
 ## Install
+Note: to test things, it might be best to switch into "Boot into Text
+Console" mode (using `raspi-config`). You can switch back into "Desktop
+GUI" mode later (see next section).
+
 ```
 $ sudo apt update
-$ sudo apt install libwayland-server-dev libxkbcommon-dev \
-    libwlroots-0.18-dev libglib-2.0-dev
+$ sudo apt install libxkbcommon-dev libwlroots-0.19-dev libglib2.0-dev
 $ git clone https://github.com/avarvit/wlroots-kbdd
 $ cd wlroots-kbdd
 $ meson setup build
 $ meson compile -C build
-$ env LD_PRELOAD=$PWD/build/libwlroots-kbdd-0.18.so labwc
+$ env LD_PRELOAD=$PWD/build/libwlroots-kbdd-0.19.so labwc
 ```
-Note: there is no need to install anything under `/usr`. The library
-will run from its build directory. Of course, you may move or install
-it wherever you please.
+Note: if you are running from a "Boot into Text Console" setup, there
+is no need to install anything under `/usr`. The library will run from
+its build directory if you issue the last command above. However, if
+you want to use it from "Boot into Desktop GUI" mode, you need to take
+another few steps; if this is the case, please read the next section.
+
+## Using "Boot into Desktop GUI" with this library
+Note: the steps in this section are necessary only you want to
+run labwc with the library enabled from "Boot in Desktop GUI" mode.
+
+So far, you did not need to fiddle with your system. However, if you
+want to make this library work with the raspi-config setup "Boot into
+Desktop GUI" mode, you need to change one system file. Happily, this
+is a shell script and is very easy to change back. However, you need
+to exercise some caution: if you garble this file and have set up your
+RPi to boot into "Desktop GUI" mode, you risk getting trapped into a
+loop where your system tries to bring up labwc, fails, and tries again
+<i>ad infinitum</i>. Here is how to do this cautiously.
+
+#### Install this library under /usr/local
+You first need to install the library somewhere safer than your home
+directory, in a place where it will not get accidentally removed or
+overwritten. This place in a linux system is `/usr/local` To install
+the library under `/usr/local`, do this:
+```
+$ sudo meson install -C build
+```
+will install the library under `/usr/local/lib/aarch64-linux-gnu`.
+
+#### Change the `labwc-pi` script to use the library
+Next, you need to tell your system to use the library from the shell
+script that the session manager invokes when you choose "Boot into
+Desktop GUI" from raspi-config. This script is `/usr/bin/labwc-pi`.
+Before doing anything with it, it is wise to save a copy:
+```
+$ sudo cp /usr/bin/labwc-pi /usr/bin/labwc-pi.orig
+```
+You then need to edit the file (remember that you need to use `sudo`
+to do this) and change this line
+```
+exec /usr/bin/labwc -m $@
+```
+into this:
+```
+exec env LD_PRELOAD=/usr/local/lib/aarch-64-linux-gnu/libwlroots-kbdd-0.19.so /usr/bin/labwc -m $@
+```
+
+#### Test it
+You may wish to execute `/usr/bin/labwc-pi` to make sure it works
+before switching from within raspi-config into 'Boot into Destkop
+GUI" mode (just run `labwc-pi` from the command line and ensure it
+works OK; if not, and you cannot figure what is wrong and fix it,
+make sure to copy `/usr/bin/labwc-pi.orig` that you saved earlier
+back into `/usr/bin/labwc-pi`). That's it. You are done.
+
 
 ## Background and motivation
 Wayland uses the xkbcommon library to represent keyboad setup and

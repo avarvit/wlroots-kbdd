@@ -1,7 +1,7 @@
 project(
 	'wlroots-kbdd',
 	'c',
-	version: '0.18.2',
+	version: '0.19.1',
 	license: 'MIT',
 	meson_version: '>=0.59.0',
 	default_options: [
@@ -109,7 +109,7 @@ xkbcommon = dependency(
 	],
 )
 
-wlroots = dependency('wlroots-0.18',
+wlroots = dependency('wlroots-0.19',
         version: '>=0.18',
         fallback: 'wlroots',
 )
