@@ -183,7 +183,7 @@ or if an erroneous path is given, or the file cannot be opened
 for output, `wlroots-kbdd` will log to `stderr` instead.
 Example use:
 ```
-$ env LD_PRELOAD=$PWD/build/libwlroots-kbdd-0.18.so DEBUG_WLROOTS_KBDD=/tmp/wlr_kbdd-debug.txt labwc
+$ env LD_PRELOAD=$PWD/build/libwlroots-kbdd-0.19.so DEBUG_WLROOTS_KBDD=/tmp/wlr_kbdd-debug.txt labwc
 ```
 will output debug logging information in `/tmp/wlr_kbdd-debug.txt`.
 Note that no strict security checks are performed (e.g., it is not
