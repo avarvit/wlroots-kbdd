@@ -74,7 +74,7 @@ exec /usr/bin/labwc -m $@
 ```
 into this:
 ```
-exec env LD_PRELOAD=/usr/local/lib/aarch-64-linux-gnu/libwlroots-kbdd-0.19.so /usr/bin/labwc -m $@
+exec env LD_PRELOAD=/usr/local/lib/aarch64-linux-gnu/libwlroots-kbdd-0.19.so /usr/bin/labwc -m $@
 ```
 
 #### Test it
