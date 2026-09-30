@@ -1,7 +1,7 @@
 # `wlroots-kbdd` DBus messages
 
 ## DBus output
-The outputs that `wlroots-kbdd` sends over DBus to `org.wayfire.wfpanel`
+The outputs that `wlroots-kbdd` sends over DBus to `com.raspberrypi.wfpanelpi`
 are:
 
 - a comma-separated list of the configured keyboard layout short
@@ -16,14 +16,14 @@ turned off, and `kbdlayout` should stop displaying layouts and
 popping up a menu (a double questionmark is displayed instead
 of a current layout, and the menu is disabled)
 
-The introspection XML for `org.wayfire.wfpanel` is:
+The introspection XML for `com.raspberrypi.wfpanelpi` is:
 ```
 <?xml version="1.0" encoding="UTF-8"?>
 <node>
-  <interface name='org.wayfire.wfpanel'>
-    <annotation name='org.wayfire.wfpanel.Annotation' value='OnInterface'/>
+  <interface name='com.raspberrypi.wfpanelpi'>
+    <annotation name='com.raspberrypi.wfpanelpi.Annotation' value='OnInterface'/>
     <method name='command'>
-      <annotation name='org.wayfire.wfpanel.Annotation' value='OnMethod'/>
+      <annotation name='com.raspberrypi.wfpanelpi.Annotation' value='OnMethod'/>
       <arg type='s' name='plugin' direction='in'/>
       <arg type='s' name='command' direction='in'/>
     </method>

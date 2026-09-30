@@ -18,10 +18,9 @@
 static GDBusConnection *dbus_conn = NULL;
 static GError *dbus_error = NULL;
 
-static const char *dbus_srvr_name = "org.wayfire.wfpanel";
-static const char *dbus_objt_path = "/org/wayfire/wfpanel";
-static const char *dbus_ifce_name = "org.wayfire.wfpanel";
-
+static const char *dbus_srvr_name = "com.raspberrypi.wfpanelpi";
+static const char *dbus_objt_path = "/com/raspberrypi/wfpanelpi";
+static const char *dbus_ifce_name = "com.raspberrypi.wfpanelpi";
 
 // the introspection XML of wf-panel-pi (unused, kept in to help the
 // reader understand the DBus messages we are sending
@@ -30,7 +29,7 @@ static const char *dbus_ifce_name = "org.wayfire.wfpanel";
 const char *notify_introspection_xml=
 "  <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 "  <node>\n"
-"    <interface name=\"org.wayfire.wfpanel\">\n"
+"    <interface name=\"com.raspberrypi.wfpanelpi\">\n"
 "      <!--\n"
 "        This protocol emulates the function of wayfire's wfpanelctl utility\n"
 "        to send \"commands\" to specific wfpanel widgets\n"

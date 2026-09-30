@@ -4,8 +4,27 @@ A RaspberryPi-specific wlroots interception library to enable
 keyboard layout reporting and switching via DBus commands.
 Currently supported compositors include only labwc.
 
+## Clone the repo or get the latest version
+If you are installing my `wlroots-kbdd` library for the first time,
+clone the repo:
+```
+$ git clone https://github.com/avarvit/wlroots-kbdd
+$ cd wlroots-kbdd
+```
+
+If you already have a previous version of my repo, make sure to
+pull the latest version, including tags:
+```
+# assuming your cloned repo is in wlroots-kbdd
+$ cd wlroots-kbdd
+$ git pull
+$ git fetch --tags
+```
+
 ## Choose your distribution
-The current HEAD and the installation instructions are for Trixie.
+The current HEAD and the installation instructions are for Trixie,
+(for a fully updated version thereof).
+
 If you are running on Bookworm, checkout the "bookworm" tag before
 building as follows, and re-check README.md (this file), since the
 dependencies for Bookworm are slightly different from the ones for
@@ -16,19 +35,58 @@ Here is how to checkout the "bookworm" tag:
 $ git checkout bookworm
 ```
 
+## Uninstall previous version (0.19.1)
+This part is entirely optional. You can run these commands to remove
+the older version (0.19) of my `wlroots-kbdd` library from your
+system. The old version links against `libwlroots-0.19`, which has
+now been superseded by `libwlroots-0.20`. If you omit this step,
+my older-version `libwlroots-kbdd-0.19` will remain on your system,
+though it will no longer be used.
+
+Only do this if you have installed the previous version of my
+`labwc-kbdd` library before and want to remove it. If you try it
+and `meson setup` fails indicating you are missing some dependencies,
+this means you are not using the older version, so you can safely
+skip the remaining steps, except the last (`git switch -`), to
+ensure you are building the latest version (0.20.1).
+
+```
+# switch to previous version
+$ git checkout trixie-0.19.1
+
+# we must rebuild and re-install to ensure ninja knows how to uninstall
+$ meson setup build
+$ meson compile -C build
+$ sudo meson install -C build
+
+# do the actual uninstall
+$ (cd build && sudo ninja uninstall)
+
+# delete the build directory and switch back to HEAD
+$ rm -rf build
+$ git switch -
+```
+
 ## Install
 Note: to test things, it might be best to switch into "Boot into Text
 Console" mode (using `raspi-config`). You can switch back into "Desktop
 GUI" mode later (see next section).
 
 ```
-$ sudo apt update
-$ sudo apt install libxkbcommon-dev libwlroots-0.19-dev libglib2.0-dev
+# if you have not cloned my repo before, do this now
 $ git clone https://github.com/avarvit/wlroots-kbdd
 $ cd wlroots-kbdd
+
+# update your system with the required dependencies for building
+$ sudo apt update
+$ sudo apt install libxkbcommon-dev libwlroots-0.20-dev libglib2.0-dev
+
+# do the actual build
 $ meson setup build
 $ meson compile -C build
-$ env LD_PRELOAD=$PWD/build/libwlroots-kbdd-0.19.so labwc
+
+# if you are running in command-line, test via this command
+$ env LD_PRELOAD=$PWD/build/libwlroots-kbdd-0.20.so labwc
 ```
 Note: if you are running from a "Boot into Text Console" setup, there
 is no need to install anything under `/usr`. The library will run from
@@ -74,7 +132,7 @@ exec /usr/bin/labwc -m $@
 ```
 into this:
 ```
-exec env LD_PRELOAD=/usr/local/lib/aarch64-linux-gnu/libwlroots-kbdd-0.19.so /usr/bin/labwc -m $@
+exec env LD_PRELOAD=/usr/local/lib/aarch64-linux-gnu/libwlroots-kbdd-0.20.so /usr/bin/labwc -m $@
 ```
 
 #### Test it
@@ -83,14 +141,16 @@ before switching from within raspi-config into 'Boot into Destkop
 GUI" mode (just run `labwc-pi` from the command line and ensure it
 works OK; if not, and you cannot figure what is wrong and fix it,
 make sure to copy `/usr/bin/labwc-pi.orig` that you saved earlier
-back into `/usr/bin/labwc-pi`). That's it. You are done.
+back into `/usr/bin/labwc-pi`). If things worked OK, that's it.
+You are done. (If not, you can complain on my Raspberry Pi forums
+thread).
 
 
 ## Background and motivation
 Wayland uses the xkbcommon library to represent keyboad setup and
 input (e.g., keyboard layouts, keymaps, modifiers, keypresses, etc.). 
 Using xkbcommon, multiple keyboard layouts can be supported, using a
-key combo (e.g., left-Alt-Shift or left Ctrl-Shift) to switch between
+key combo (e.g., left Alt-Shift or left Ctrl-Shift) to switch between
 configured layout groups (aka languages). Wayland leaves this task to
 compositors (it is not a core protocol feature), so each compositor
 has its own way of configuring multiple layouts and the key combo
@@ -132,7 +192,7 @@ Raspberry PI UI experts have ported it into a RPI-specific
 panel, to be used with both `wayfire` and, more recently, `labwc`.
 
 `wf-panel-pi` accepts commands via DBus, addressed to
-`org.wayfire.wfpanel`. Commands take the form `command <widget>
+`com.raspberrypi.wfpanelpi`. Commands take the form `command <widget>
 <argument>`, directing the "command" to widget `<widget>`
 and passing it the argument `<argument>`. This is used among others
 to drive bundled `wf-panel-pi` widgets, such as a volume control
@@ -167,12 +227,6 @@ is done early enough in the initialization of the compositor, so that
 no other programs spawned by the compositor are affected by the
 LD_PRELOAD setting.
 
-In this current version, if a shutdown is initiated while a DBus
-message is sent and before a few milliseconds (the timeout), the
-shutdown may hung for 90 seconds waiting for the DBus session to
-terminate. This is not serious, the system eventually shuts down
-and no harm is done.
-
 ## Debug logging
 `wlroots-kbdd` will log debug information if the environment
 variable `DEBUG_WLROOTS_KBDD` is set. If the variable is set
@@ -183,7 +237,7 @@ or if an erroneous path is given, or the file cannot be opened
 for output, `wlroots-kbdd` will log to `stderr` instead.
 Example use:
 ```
-$ env LD_PRELOAD=$PWD/build/libwlroots-kbdd-0.19.so DEBUG_WLROOTS_KBDD=/tmp/wlr_kbdd-debug.txt labwc
+$ env LD_PRELOAD=$PWD/build/libwlroots-kbdd-0.20.so DEBUG_WLROOTS_KBDD=/tmp/wlr_kbdd-debug.txt labwc
 ```
 will output debug logging information in `/tmp/wlr_kbdd-debug.txt`.
 Note that no strict security checks are performed (e.g., it is not
